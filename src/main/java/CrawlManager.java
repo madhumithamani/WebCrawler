@@ -5,25 +5,36 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by MadVish on 4/14/16.
- */
+
 public class CrawlManager {
     private final int minimumLinksToCrawl;
     private final int politenessInMs;
     private int tasksProcessed = 0;
+    private String allowedURL;
 
     public static volatile HashMap<String,DomainInfo> domainCollection = new HashMap<String, DomainInfo>();
 
-    public CrawlManager(int minumumLinksToCrawl, int politenessInMs, String startUrl) {
+    public CrawlManager(int minumumLinksToCrawl, int politenessInMs, String startUrl,String allowedURL) {
         this.minimumLinksToCrawl = minumumLinksToCrawl;
         this.politenessInMs = politenessInMs;
+        this.allowedURL = allowedURL;
         addURL(startUrl);
     }
 
+
     public void addURL(String url){
         String domainName = getDomainName(url);
+        if(!allowedURL.equalsIgnoreCase("-")){
+            String allowedDomainName = getDomainName("http://"+allowedURL);
+            System.out.println("domain:" + domainName);
+            System.out.println("allowedDomain:" + allowedDomainName);
+            if(!domainName.equalsIgnoreCase(allowedDomainName)){
+                System.out.println("Rejected URL:" + url);
+                return;
+            }
+        }
         synchronized (this){
+            System.out.println("Adding url:" + url);
             if(!domainCollection.containsKey(domainName)){
                 domainCollection.put(domainName, new DomainInfo());
             }
