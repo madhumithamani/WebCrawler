@@ -56,6 +56,11 @@ public class PageCrawlerMain {
         }
     }
 
+    private static void generateReport(){
+        createReport myHtml = new createReport();
+        myHtml.createHTML(PageCrawlerRunnable.pageInfoCollection);
+    }
+
     public static void main(String[] args) throws InterruptedException {
         readSeedFile();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
@@ -69,6 +74,8 @@ public class PageCrawlerMain {
             Thread.sleep(100);
         }
         executor.shutdownNow();
+        //DOMParser.readAllFiles();
+        generateReport();
         System.exit(0);
     }
 }

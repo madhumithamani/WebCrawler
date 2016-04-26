@@ -62,7 +62,7 @@ public abstract class ZipfCounter {
                     System.out.println(entry.getKey() + "::" + entry.getValue());
                 }
                 bufferedWriter.close();
-//                System.out.println("Content saved successfully");
+///                System.out.println("Content saved successfully");
             }catch(IOException ex){
                 ex.printStackTrace();
             } finally {
@@ -73,10 +73,7 @@ public abstract class ZipfCounter {
                         e.printStackTrace();
                     }
             }
-
         }
-
-
     }
 
     private static boolean createNewDocument(String localURL){
@@ -94,6 +91,6 @@ public abstract class ZipfCounter {
     }
 
     public static void main(String[] args) {
-        ZipfCounter.countFrquency("/Users/MadVish/Documents/zipf.txt");
+        ZipfCounter.countFrquency("/Users/MadVish/Documents/WSIR/coen272/projectsamples/output.txt");
     }
 }

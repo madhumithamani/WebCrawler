@@ -21,7 +21,7 @@ import java.util.UUID;
 public class PageCrawlerRunnable implements Runnable {
     private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36";
     private static final String REPOSITORY_PATH =  "/Users/MadVish/Documents/WSIR/coen272/projectsamples/repository";
-    public static PageInfo[] pageInfoCollection;
+    public static ArrayList<PageInfo> pageInfoCollection = new ArrayList<PageInfo>();
     private final String crawlURL;
     private final CrawlManager crawlManager;
 
@@ -49,7 +49,7 @@ public class PageCrawlerRunnable implements Runnable {
         //5. get the image count
         //6. generate a name for the page
         //7. create an html file and store it
-        System.out.println(crawlURL);
+        System.out.println("crawling URL:" + crawlURL);
         Connection connection = Jsoup.connect(crawlURL)
                 .userAgent(USER_AGENT)
                 .maxBodySize(0); //allows having an unlimited body size
@@ -97,7 +97,6 @@ public class PageCrawlerRunnable implements Runnable {
     private static void savePage(String content, PageInfo pageInfo) {
         String localDocName = generateLocalDocName();
         String localURL = REPOSITORY_PATH+"/"+localDocName+".html";
-//        System.out.println("DocName:" + localDocName);
         if(createNewDocument(localURL)) //file creation successful
         {
             pageInfo.setlocalURL(localURL);
@@ -108,7 +107,10 @@ public class PageCrawlerRunnable implements Runnable {
                 bufferedWriter.write(content);
                 bufferedWriter.flush();
                 bufferedWriter.close();
-//                System.out.println("Content saved successfully");
+                System.out.println("PageInfo:" + pageInfo.getHttpStatusCode());
+                synchronized (pageInfoCollection) {
+                    pageInfoCollection.add(pageInfo);
+                }
             }catch(IOException ex){
                 ex.printStackTrace();
             } finally {
@@ -119,21 +121,17 @@ public class PageCrawlerRunnable implements Runnable {
                         e.printStackTrace();
                     }
             }
-
         }
     }
 
     private static String generateLocalDocName(){
         //http://gregszabo.blogspot.com/2010/01/generating-unique-file-names-with.html
         String uuid = UUID.randomUUID().toString();
-//        String DATE_FORMAT="yyyyMMdd_HHmmss-SSS";
-//        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
         Random random = new Random();
         return uuid +"-"+random.nextInt();
     }
 
     private static boolean createNewDocument(String localURL){
-//        System.out.println("Location:" + localURL);
         File file = new File(localURL);
         // if file does not exists, then create it
         if (!file.exists()) {
@@ -142,7 +140,6 @@ public class PageCrawlerRunnable implements Runnable {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
         }
         return true;
     }

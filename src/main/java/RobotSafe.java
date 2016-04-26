@@ -55,8 +55,8 @@ public class RobotSafe {
 		
 		if (strCommands.contains("Disallow")) {
 			String[] split = strCommands.split("\n");
-			ArrayList<RobotRule> robotRulesDisallow = new ArrayList<>();
-			ArrayList<RobotRule> robotRulesAllow = new ArrayList<>();
+			ArrayList<RobotRule> robotRulesDisallow = new ArrayList();
+			ArrayList<RobotRule> robotRulesAllow = new ArrayList();
 
 			String mostRecentUserAgent = null;
 			for (int i = 0; i < split.length; i++) {
