@@ -90,14 +90,19 @@ public class DOMParser {
         //System.out.println("Max Density Sum Elem" + maxDensitySumElem.text());
         threshold = printCTDToBody(maxDensitySumElem, document.body());
         System.out.println("New T : " + threshold);
+
+
         String text = extractText(document.body().getAllElements().first(), threshold,maxDensitySum);
-        System.out.println(text);
+        StringBuilder finalOutput = new StringBuilder();
+        finalOutput.append(document.select("title").text());
+        finalOutput.append(text);
+        System.out.println(finalOutput);
 
 //        System.out.println(maxDensitySumElem.text());
         //System.out.println(text);
         htmlBuilder.append("</body></html>");
         Document doc = Jsoup.parse(htmlBuilder.toString());
-        System.out.println(doc);
+     //   System.out.println(doc);
 //        Whitelist whitelist = Whitelist.simpleText();
        // postProcess(doc,threshold);
 
@@ -131,7 +136,7 @@ public class DOMParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(text);
+        //System.out.println(text);
     }
 
 //    private static void computeDensity(Element node){
