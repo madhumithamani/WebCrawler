@@ -96,8 +96,8 @@ public class WordLCS {
 		float recall = 0;
 		float F1score = 0;
 		
-		precision = ((float)lenLCS / lenActual)*100;
-		recall = ((float)lenLCS / lenProcessed)*100;
+		precision = ((float)lenLCS / lenProcessed)*100;
+		recall = ((float)lenLCS / lenActual)*100;
 		F1score = (2 * precision * recall) / (precision + recall);
 		
 		System.out.println("********************************************************");
@@ -120,8 +120,8 @@ public class WordLCS {
 		File fileActual, fileProcessed;
 		String strActual = null, strProcessed = null;
 		WordLCS wLcs = new WordLCS();
-		fileActual = new File("E:/evaluation/GoldStandard/Why women professors.txt"); 	// Manually extracted content that is used for evaluation  
-		fileProcessed = new File("E:/evaluation/ContentProcessor/OUT_Why women professors.txt"); // Content processor output 
+		fileActual = new File("E:/evaluation/GoldStandard/ct-nfl-draft-sponsorship.txt"); 	// Manually extracted content that is used for evaluation  
+		fileProcessed = new File("E:/evaluation/ContentProcessor/OUT_ct-nfl-draft-sponsorship.txt"); // Content processor output 
 		try {
 			strActual = FileUtils.readFileToString(fileActual);	
 			strProcessed = FileUtils.readFileToString(fileProcessed);
