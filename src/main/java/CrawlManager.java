@@ -1,4 +1,6 @@
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +26,23 @@ public class CrawlManager {
 
     public void addURL(String url){
         String domainName = getDomainName(url);
+//        if(!allowedURL.equalsIgnoreCase("-")){
+//            String allowedDomainName = getDomainName("http://"+allowedURL);
+//            System.out.println("domain:" + domainName);
+//            System.out.println("allowedDomain:" + allowedDomainName);
+//            if(!domainName.equalsIgnoreCase(allowedDomainName)){
+//                System.out.println("Rejected URL:" + url);
+//                return;
+//            }
+//        }
         if(!allowedURL.equalsIgnoreCase("-")){
+            try {
+                URI uri = new URI(allowedURL);
+
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+
             String allowedDomainName = getDomainName("http://"+allowedURL);
             System.out.println("domain:" + domainName);
             System.out.println("allowedDomain:" + allowedDomainName);
@@ -33,7 +51,7 @@ public class CrawlManager {
                 return;
             }
         }
-        synchronized (this){
+        synchronized (domainCollection){
             System.out.println("Adding url:" + url);
             if(!domainCollection.containsKey(domainName)){
                 domainCollection.put(domainName, new DomainInfo());
