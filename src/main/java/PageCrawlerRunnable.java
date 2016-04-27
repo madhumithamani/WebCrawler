@@ -1,4 +1,5 @@
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +21,7 @@ import java.util.UUID;
  */
 public class PageCrawlerRunnable implements Runnable {
     private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36";
-    private static final String REPOSITORY_PATH =  "/Users/MadVish/Documents/WSIR/coen272/projectsamples/repository";
+    public static final String REPOSITORY_PATH =  "/Users/MadVish/Documents/WSIR/coen272/projectsamples/repository";
     public static ArrayList<PageInfo> pageInfoCollection = new ArrayList<PageInfo>();
     private final String crawlURL;
     private final CrawlManager crawlManager;
@@ -37,10 +38,17 @@ public class PageCrawlerRunnable implements Runnable {
 
     //once the link is fetched, see if it is in the list of already visited URL's
     public void run() {
-        startCrawlProcess();
+        try{
+            startCrawlProcess();
+        } catch (Throwable e) {
+            System.out.println("Error while crawling " + crawlURL);
+            e.printStackTrace();
+        }finally {
+            crawlManager.completed(crawlURL);
+        }
     }
 
-    private void startCrawlProcess(){
+    private void startCrawlProcess() throws IOException {
         //1. download the page content
         //2. get the title of the page
         //2. get the valid URLs (html links) to crawl
@@ -52,22 +60,26 @@ public class PageCrawlerRunnable implements Runnable {
         System.out.println("crawling URL:" + crawlURL);
         Connection connection = Jsoup.connect(crawlURL)
                 .userAgent(USER_AGENT)
-                .maxBodySize(0); //allows having an unlimited body size
+                .maxBodySize(0) //allows having an unlimited body size
+        .timeout(10000);
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setliveURL(crawlURL);
+        synchronized (pageInfoCollection) {
+            pageInfoCollection.add(pageInfo);
+        }
         try {
             Document document = connection.get();
-            PageInfo pageInfo = new PageInfo();
-            pageInfo.setliveURL(crawlURL);
             pageInfo.setHttpStatusCode(connection.response().statusCode());
-            crawlManager.completed(crawlURL);
             if(pageInfo.getHttpStatusCode() == 200){
                 processPage(document, pageInfo);
             }
-
-        }catch (IOException ex){
-            ex.printStackTrace();
+        }catch (HttpStatusException ex){
+            pageInfo.setHttpStatusCode(ex.getStatusCode());
+            throw ex;
         }
     }
-    private void processPage(Document document, PageInfo pageInfo){
+    private void processPage(Document document, PageInfo pageInfo) throws IOException {
         pageInfo.setTitle(document.title());
         Elements links = document.select("a[href]");
         //Elements imports = document.select("link[href]");
@@ -94,7 +106,7 @@ public class PageCrawlerRunnable implements Runnable {
 
     }
 
-    private static void savePage(String content, PageInfo pageInfo) {
+    private static void savePage(String content, PageInfo pageInfo) throws IOException {
         String localDocName = generateLocalDocName();
         String localURL = REPOSITORY_PATH+"/"+localDocName+".html";
         if(createNewDocument(localURL)) //file creation successful
@@ -107,19 +119,10 @@ public class PageCrawlerRunnable implements Runnable {
                 bufferedWriter.write(content);
                 bufferedWriter.flush();
                 bufferedWriter.close();
-                System.out.println("PageInfo:" + pageInfo.getHttpStatusCode());
-                synchronized (pageInfoCollection) {
-                    pageInfoCollection.add(pageInfo);
-                }
-            }catch(IOException ex){
-                ex.printStackTrace();
+//                System.out.println("PageInfo:" + pageInfo.getHttpStatusCode());
             } finally {
                 if(fileWriter  != null)
-                    try {
-                        fileWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    fileWriter.close();
             }
         }
     }
@@ -131,15 +134,11 @@ public class PageCrawlerRunnable implements Runnable {
         return uuid +"-"+random.nextInt();
     }
 
-    private static boolean createNewDocument(String localURL){
+    private static boolean createNewDocument(String localURL) throws IOException {
         File file = new File(localURL);
         // if file does not exists, then create it
         if (!file.exists()) {
-            try {
-                return file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            return file.createNewFile();
         }
         return true;
     }

@@ -18,7 +18,7 @@ import org.jsoup.nodes.Element;
 public class createReport {
 
 	public void createHTML(ArrayList<PageInfo> allPages) {
-
+		System.out.println("Creating report.html");
 		File htmlTemplateFile = new File("src/main/java/template.html");
 		String htmlString = null;
 
@@ -32,13 +32,17 @@ public class createReport {
 		try {
 			Document document = Jsoup.parse(htmlTemplateFile, "UTF-8");
 			Element tableElement = document.select("tbody").first();
-			
-			for (PageInfo pageObj : allPages) {
+			for (int i = 0; i < allPages.size(); i++) {
+				PageInfo pageObj = allPages.get(i);
 				tableElement.append("<tr> </tr>");
 				tableElement
 						.select("tr")
 						.last()
-						.append("<td> <a href = " + pageObj.getliveURL() 
+						.append("<td>" + (i+1) + "</td>");
+				tableElement
+						.select("tr")
+						.last()
+						.append("<td> <a href = " + pageObj.getliveURL()
 								+ " target = '_blank' >"
 								+ pageObj.getliveURL()
 								//+ pageObj.getTitle()

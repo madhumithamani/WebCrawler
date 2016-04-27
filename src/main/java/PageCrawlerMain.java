@@ -11,12 +11,13 @@ public class PageCrawlerMain {
     private static int totalPages = 0;
     private static String allowedDomain = null;
     private static int politnessPolicy  = 100;
+    private final static String SEED_FILE_PATH = "/Users/MadVish/Documents/seed.csv";
 
     private static void readSeedFile(){
         FileReader fileReader = null;
         try {
             String line;
-            fileReader = new FileReader("/Users/MadVish/Documents/seed.csv");
+            fileReader = new FileReader(SEED_FILE_PATH);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             line = bufferedReader.readLine().trim();
             if(line.length()>0){
@@ -61,11 +62,11 @@ public class PageCrawlerMain {
         myHtml.createHTML(PageCrawlerRunnable.pageInfoCollection);
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         readSeedFile();
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(20, 20, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         CrawlManager crawlManager = new CrawlManager(totalPages, politnessPolicy, seed,allowedDomain);
-        while(!crawlManager.hasMinimumCapacityMet()){
+        while(!crawlManager.hasCrawlCompleted() ){
             Set<String> nextUrlsToProcess = crawlManager.getNextUrlsToProcess();
             for (String url : nextUrlsToProcess) {
                 PageCrawlerRunnable runnable = new PageCrawlerRunnable(url, crawlManager);
@@ -74,7 +75,7 @@ public class PageCrawlerMain {
             Thread.sleep(100);
         }
         executor.shutdownNow();
-        //DOMParser.readAllFiles();
+        DOMParser.readAllFiles();
         generateReport();
         System.exit(0);
     }

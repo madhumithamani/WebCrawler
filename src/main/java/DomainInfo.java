@@ -10,6 +10,11 @@ public class DomainInfo {
     private boolean isServing = false;
     private Queue<String> yetToCrawlUrls = new LinkedBlockingQueue<String>();
     private HashSet<String> crawledURLs = new HashSet<String>();
+    private RobotInfo robotInfo;
+
+    public DomainInfo(RobotInfo robotInfo) {
+        this.robotInfo = robotInfo;
+    }
 
     public Long getLastCrawledTime() {
         return lastCrawledTime;
@@ -27,11 +32,20 @@ public class DomainInfo {
         isServing = status;
     }
 
+    public boolean hasMoreURLsToCrawl() {
+        return !yetToCrawlUrls.isEmpty();
+    }
+
     public String getNextURLToCrawl(){
         while(yetToCrawlUrls.peek() != null){
             String url = yetToCrawlUrls.poll();
             if(!hasCrawledURL(url)){
-                return url;
+                if(robotInfo.isUrlAllowed(url)){
+                    return url;
+                } else {
+//                    System.out.println("URL not allowed as per robot:" + url);
+                }
+
             }
         }
         return null;

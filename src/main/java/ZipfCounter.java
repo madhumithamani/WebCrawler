@@ -49,11 +49,11 @@ public abstract class ZipfCounter {
     }
 
     private static void displayAndWriteToFile(){
-        if(createNewDocument("/Users/MadVish/Documents/zipfoutput.csv"))
+        if(createNewDocument("/Users/MadVish/Documents/zipfoutput_final_nytimes.csv"))
         {
             FileWriter fileWriter = null;
             try {
-                fileWriter = new FileWriter("/Users/MadVish/Documents/zipfoutput.csv");
+                fileWriter = new FileWriter("/Users/MadVish/Documents/zipfoutput_final_nytimes.csv");
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 for(Map.Entry<String,Integer> entry: termFrequencyTracker.entrySet()){
                     bufferedWriter.write(entry.getKey() + "," + entry.getValue());
@@ -91,6 +91,6 @@ public abstract class ZipfCounter {
     }
 
     public static void main(String[] args) {
-        ZipfCounter.countFrquency("/Users/MadVish/Documents/WSIR/coen272/projectsamples/output.txt");
+        ZipfCounter.countFrquency("/Users/MadVish/Documents/WSIR/coen272/projectsamples/finalOutput.txt");
     }
 }
